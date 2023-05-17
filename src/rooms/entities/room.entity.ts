@@ -1,13 +1,16 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import { Reservation } from 'src/reservations/entities/reservation.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 TypeOrmModule.forRoot()
 @Entity()
 export class Room {
     
     @PrimaryGeneratedColumn()
     id: number;
+    
     @Column()
     roomname: String;
-    @Column({ type: 'text' })
-    reservations?: String;
+
+    @OneToMany(() => Reservation, reservation => reservation.room_)
+    reservations?: Reservation[];
 }

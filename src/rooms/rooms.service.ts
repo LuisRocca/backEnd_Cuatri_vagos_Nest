@@ -5,58 +5,34 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RoomRepository } from './room.repository';
 import { Room } from './entities/room.entity';
 
-let dbRooms = [
-  {id: 1 ,roomName: 'el solar', Reservation: [], },
-  {id: 2 ,roomName: 'el parpal', Reservation: [], },
-  {id: 3 ,roomName: 'el menecune', Reservation: [], },
-  {id: 4 ,roomName: 'el carcajito', Reservation: [], },
-];
-
 @Injectable()
-
 
 export class RoomsService {
   constructor( @InjectRepository(RoomRepository) private roomRepository: RoomRepository ){}
 
-  create(createRoomDto: CreateRoomDto) {
-    const {roomName, Reservation} = createRoomDto;
-    const newRoom = {id: dbRooms.length + 1 ,roomName: roomName.toString(), Reservation: Reservation, }
-    dbRooms.push(
-      newRoom
-    )
-    return newRoom;
+  db = this.roomRepository.manager;
+
+  async create(createRoomDto: CreateRoomDto) {
+    const {roomName, reservation} = createRoomDto;
+    const response = await this.roomRepository.manager.query(`INSERT INTO room (roomname) VALUES ('${roomName}');`);   
+    return response;
   }
 
-  // async findAll() {
-  //   console.log('estamos')
-  //   return await this.roomRepository.find();
-  // }
   async findAll(): Promise<Room[]> {
-    console.log(await this.roomRepository, "<---este es mi console log")
-    return await this.roomRepository.find();
+    return await this.db.query('select * from room');;
   }
 
-  findOne(id: number) {
-    return dbRooms.find(e => e.id === id);
+  async findOne(id: number) {
+    return await this.db.query(`SELECT * FROM room WHERE id = ${id}`);
   }
 
-  update(id: number, updateRoomDto: UpdateRoomDto) {
-    const {roomName, Reservation} = updateRoomDto;
-    const roomUpdate = dbRooms.find(e => e.id === id);
-    roomUpdate['Reservation'] = Reservation
-    roomUpdate['roomName'] = roomName.toString();
-    return roomUpdate;
+  async update(id: number, updateRoomDto: UpdateRoomDto) {
+    const { roomName, reservation } = updateRoomDto;
+    console.log(reservation == undefined ? '1' : '2')
+    return await this.db.query(`UPDATE room SET roomname = '${roomName}', reservations = '{${reservation}}' WHERE id = ${id}`);
   }
 
-  remove(id: Number) {
-    const roomRemove = dbRooms.find(e => e.id === id);
-   const resultado = [];
-      for (var i = 0; i < dbRooms.length; i++) {
-        if (dbRooms[i].id !== id) {
-          resultado.push(dbRooms[i]);
-        }
-      }      
-    dbRooms = resultado;
-    return `This action removes a room id: ${id} room`;
+  async remove(id: Number) {
+  return await this.db.query(`DELETE FROM room WHERE id = ${id}`);
   }
 }

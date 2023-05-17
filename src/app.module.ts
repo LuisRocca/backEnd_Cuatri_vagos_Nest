@@ -5,6 +5,7 @@ import { RoomsModule } from './rooms/rooms.module';
 // librerias de coneccion a la db 
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { Connection } from 'typeorm';
+import { ReservationsModule } from './reservations/reservations.module';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     logging: true,
   }
   ),
-  RoomsModule
+  RoomsModule,
+  ReservationsModule
 ],
   controllers: [AppController],
   providers: [AppService],
